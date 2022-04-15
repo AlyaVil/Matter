@@ -1,0 +1,51 @@
+p5.disableFriendlyErrors = true;
+
+var engine;
+var boxes = []
+var mouseConstraint
+
+function setup() {
+	createCanvas(1112, 834);
+	colorMode(HSB, 255);
+	background(0);
+	let {Engine,Bodies,World,Mouse,MouseConstraint,Events} = Matter
+	let ground = Bodies.rectangle(width/2,height-140,width,50,{isStatic: true})
+	let wallLeft = Bodies.rectangle(-15,height/2,30,height,{isStatic:true})
+	let wallRight = Bodies.rectangle(width+15,height/2,30,height,{isStatic:true})
+	engine = Engine.create()
+
+	var mouse = Mouse.create(document.body)
+	mouseConstraint = MouseConstraint.create(engine,{
+		mouse:mouse
+		})
+	World.add(engine.world,mouseConstraint)
+	
+	boxes.push(ground)
+	boxes.push(wallLeft)
+	boxes.push(wallRight)
+	World.add(engine.world,boxes)
+	Engine.run(engine)
+}
+var constraints = []
+function generarteNewBox(){
+	let {Engine,Bodies,World,Constraint} = Matter
+	let sz = random([20,40,60])
+	let boxA = Bodies.polygon(random(width),random(mouseY),int(random(3,10)),sz)	
+	boxA.color = color(random(255), 200, 255);
+	boxA.sz = sz 
+	boxA.char = random("DESIGN&ART!".split(""))
+	boxes.push(boxA)
+	var constraint = Constraint.create({
+		pointA :{x:width/2,y:700},
+		bodyB : boxA,
+		length : random(50,width/2) ,
+		stiffness : 0.01,
+		damping:0.02
+	})
+	constraints.push(constraint)
+	World.add(engine.world,constraint)
+	World.add(engine.world,boxA)
+}
+function mousePressed(){
+	generarteNewBox()
+}
